@@ -6,7 +6,7 @@
 
 > **Paper:** "AI-Enhanced Predictive Maintenance for Industrial Robotics via Multi-Modal Sensor Data Analysis"  
 > **Authors:** Most Arina Afrin · Elham Ahmadi · Mohammed Elmusrati  
-> **Venue:** 50th Annual Conference of the IEEE Industrial Electronics Society (IECON 2026)  
+> **Venue:** 52th Annual Conference of the IEEE Industrial Electronics Society (IECON 2026)  
 > **Institution:** School of Technology and Innovation, University of Vaasa, Finland
 
 ---
