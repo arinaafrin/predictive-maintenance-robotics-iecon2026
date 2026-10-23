@@ -113,7 +113,84 @@ The notebook is fully self-contained and runs sequentially. Each section corresp
 
 ---
 
-> Note: The Sheffield dataset does not contain run-to-failure trajectories, so true RUL estimation is not possible. The kinematic drift proxy serves as a health-index surrogate for maintenance prioritisation.
+> **RUL limitation:** The project notes that the Sheffield dataset does not contain run-to-failure trajectories. Therefore, true remaining useful life cannot be directly estimated from this dataset. The kinematic-drift proxy should be described as a health-index surrogate, not a validated RUL estimate.
+
+---
+
+## Extension: Uncertainty Analysis (Exploratory Work)
+
+This extension is separate from the original IECON 2026 paper. It investigates model calibration, conformal prediction, and uncertainty-aware decision support on held-out users.
+
+Initial checks found that the `non_compliant` label is associated with `Tool_Velocity_mean`. The anomaly-window mean was **0.9431**, compared with **0.9999** for normal windows in the current feature dataset. Anomaly windows were spread through the recordings: the first and last 20% had a combined rate of **12.2%**, compared with **11.8%** in the middle 60%.
+
+These checks show an association between tool velocity and the target label. They do **not** establish that the model detects robot faults or improves maintenance decisions. The meaning of the label should be confirmed using the dataset documentation and discussed with the research supervisors.
+
+### Set up the extension
+
+Install dependencies:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+Run the tests:
+
+```bash
+python tests/run_tests.py
+```
+
+### Build the feature dataset
+
+If `Data/features.csv` has not been generated, first inspect the available labels:
+
+```bash
+python -m uncertainty.build_features --data-dir Data --diagnose
+```
+
+If the intended target is non-compliance defined as `isCompliance == False`, build the feature dataset with:
+
+```bash
+python -m uncertainty.build_features --data-dir Data --label isCompliance --invert --out Data/features.csv
+```
+
+If your study instead uses `isCollision`, use the appropriate label option and keep the target consistent in every subsequent command. Do not assume `isCollision` and `non_compliant` represent the same outcome.
+
+### Run the quick label checks
+
+```bash
+python -m uncertainty.quick_checks --csv Data/features.csv --target non_compliant
+```
+
+### Run the uncertainty study
+
+```bash
+python -m uncertainty.uq_study --csv Data/features.csv --target non_compliant --group User_ID
+```
+
+The exact command-line options must match the scripts in the current repository. Outputs are expected under `results/uncertainty/`, if configured that way by the implementation.
+
+Synthetic demo data (if invoked with `--demo`) checks code execution only; it is not evidence of real-world performance. Costs in `CostModel` are placeholders unless they have been validated using real operational or maintenance data.
+
+### Next validation steps
+
+The extension should evaluate whether uncertainty estimates remain useful under more difficult conditions:
+
+1. **Few training users:** train on only 3–5 users and test on users not used for training.
+2. **Distribution shift:** test on users with unusual velocity profiles.
+3. **Sensor noise or drift:** perturb test features and evaluate calibration and conformal coverage.
+4. **Harder target:** investigate remaining useful life only if suitable run-to-failure data or a defensible target is available.
+
+Report calibration, coverage, and deferral results only after running the corresponding experiments. Do not claim that uncertainty improves maintenance outcomes unless the results support that conclusion.
+
+---
+
+## Limitations and Responsible Interpretation
+
+- Strong performance on the current target does not automatically mean the model detects mechanical faults.
+- Tool velocity may be strongly associated with the target label; confirm what the labels represent before drawing physical conclusions.
+- The dataset does not provide run-to-failure trajectories for direct RUL estimation.
+- Decision thresholds and maintenance costs require validation before use in operational settings.
+- Stress tests are needed to understand how calibration, coverage, and predictions behave under limited data, distribution shift, and sensor noise.
 
 ---
 

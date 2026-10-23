@@ -1,0 +1,11 @@
+Data/*
+!Data/README.md
+results/**/*.csv
+!results/uncertainty/summary.csv
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+venv/
+__pycache__/
+*.py[cod]
+.env
